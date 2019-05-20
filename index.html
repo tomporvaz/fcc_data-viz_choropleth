@@ -19,37 +19,48 @@
         const padding = 40;
         const bottomPadding = 120;
         
+        let eduData = {};
+        d3.json("https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/for_user_education.json")
+        .then(function(data) {eduData = data});
+        
         const map = d3.select("figure").append("svg")
         .attr("width", w)
         .attr("height", h);
         
+        
+        
         d3.json("https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/counties.json")
         .then(function(topo){
-
+            
             const map = d3.select("figure").append("svg")
-        .attr("width", w)
-        .attr("height", h);
-
-
-
+            .attr("width", w)
+            .attr("height", h);
+            
+            
+            
             const geoTopo = topojson.feature(topo, topo.objects.counties);
-
+            
             const mapGen = d3.geoPath(d3.geoAlberUsa);
-
-           map.selectAll("path")
+            
+            map.selectAll("path")
             .data(geoTopo.features)
             .enter()
             .append("path")
             .attr("d", d3.geoPath(d3.geoAlberUsa))
             .attr("class", "county")
+            .attr("id", d => d.id)
             .attr("data-fips", d => d.id);
-
+            
+            map.selectAll("path")
+            .data(eduData, function(d) {d.fips === this.id ? d.fips : this.id})
+            .attr("data-education", d => d.bachelorsOrHigher);
+            
             
             /* map.append("path")
-                .datum(geoTopo)
-                .attr("d",  d3.geoPath(d3.geoAlberUsa)); */
+            .datum(geoTopo)
+            .attr("d",  d3.geoPath(d3.geoAlberUsa)); */
             
-            console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
+            //console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
             
             
             
@@ -135,6 +146,11 @@
             .text("Temp Variance (Celsius)")
             .attr("x", 65)
             .attr("y", 12); */
+            
+            
+            //test output
+            console.log("Educational DATA: " + JSON.stringify(eduData));
+            
         });
     </script>
     
