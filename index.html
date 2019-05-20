@@ -25,12 +25,31 @@
         
         d3.json("https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/counties.json")
         .then(function(topo){
+
+            const map = d3.select("figure").append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+
+
+            const geoTopo = topojson.feature(topo, topo.objects.counties);
+
+            const mapGen = d3.geoPath(d3.geoAlberUsa);
+
+           map.selectAll("path")
+            .data(geoTopo.features)
+            .enter()
+            .append("path")
+            .attr("d", d3.geoPath(d3.geoAlberUsa))
+            .attr("class", "county")
+            .attr("data-fips", d => d.id);
+
             
-            map.append("path")
-                .datum(topojson.feature(topo, topo.objects.counties))
-                .attr("d", d3.geo.path().projection(d3.geo.mercator()));
+            /* map.append("path")
+                .datum(geoTopo)
+                .attr("d",  d3.geoPath(d3.geoAlberUsa)); */
             
-            
+            console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
             
             
             
