@@ -49,18 +49,22 @@
             .attr("d", d3.geoPath(d3.geoAlberUsa))
             .attr("class", "county")
             .attr("id", d => d.id)
-            .attr("data-fips", d => d.id);
+            .attr("data-fips", d => d.id)
+            //join educational data below using filter method referncing d.id
+            .attr("data-education", d => {
+                eduData.filter()
+            });
             
-            map.selectAll("path")
+            /* map.selectAll("path")
             .data(eduData, function(d) {d.fips === this.id ? d.fips : this.id})
-            .attr("data-education", d => d.bachelorsOrHigher);
+            .attr("data-e ducation", d => d.bachelorsOrHigher);*/
             
             
             /* map.append("path")
             .datum(geoTopo)
             .attr("d",  d3.geoPath(d3.geoAlberUsa)); */
             
-            //console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
+            console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
             
             
             
@@ -149,7 +153,7 @@
             
             
             //test output
-            console.log("Educational DATA: " + JSON.stringify(eduData));
+            //console.log("Educational DATA: " + JSON.stringify(eduData));
             
         });
     </script>
