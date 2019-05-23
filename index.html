@@ -31,50 +31,33 @@
         
         d3.json("https://raw.githubusercontent.com/no-stack-dub-sack/testable-projects-fcc/master/src/data/choropleth_map/counties.json")
         .then(function(topo){
-            
+            const geoTopo = topojson.feature(topo, topo.objects.counties);
+            const min = d3.min(eduData, d => d.bachelorsOrHigher);
+            const max = d3.max(eduData, d => d.bachelorsOrHigher);
+
             const map = d3.select("figure").append("svg")
             .attr("width", w)
             .attr("height", h);
             
-            
-            
-            const geoTopo = topojson.feature(topo, topo.objects.counties);
-            
-            const mapGen = d3.geoPath(d3.geoAlberUsa);
-            
+            const color = d3.scaleSequential(
+                [min, max], 
+                d3.interpolateInferno
+                );
+                
             map.selectAll("path")
             .data(geoTopo.features)
             .enter()
             .append("path")
-            .attr("d", d3.geoPath(d3.geoAlberUsa))
+            .attr("d", d3.geoPath())
             .attr("class", "county")
             .attr("id", d => d.id)
             .attr("data-fips", d => d.id)
-            //join educational data below using filter method referncing d.id
             .attr("data-education", d => {
-                eduData.filter()
-            });
-            
-            /* map.selectAll("path")
-            .data(eduData, function(d) {d.fips === this.id ? d.fips : this.id})
-            .attr("data-e ducation", d => d.bachelorsOrHigher);*/
-            
-            
-            /* map.append("path")
-            .datum(geoTopo)
-            .attr("d",  d3.geoPath(d3.geoAlberUsa)); */
-            
-            console.log("THIS SHOULD BE GEOJSON: " + JSON.stringify(geoTopo));
-            
-            
-            
-            //add description here            //map description
-            map.append("desc")
-            .attr("id", "description")
-            .append("text")
-            .text("");
-            
-            /* 
+                return eduData.find(data => data.fips === d.id).bachelorsOrHigher
+            })
+            .attr("fill", d => {
+                return color(eduData.find(data => data.fips === d.id).bachelorsOrHigher)
+            }) 
             .on("mouseover", showTip)
             .on("mousemove", d => moveTip(d))
             .on("mouseout", hideTip);
@@ -85,43 +68,47 @@
             .attr("id", "tooltip")
             .style("display", "none");
             
-            
             function showTip() {
                 tooltip.style("display", "inline");
             }
             
             function moveTip(data) {
-                tooltip.text(monthFormat(mmDate(data.month)) + " " + data.year + ";  Temp: " + (data.variance + 8.66).toFixed(3))
-                .attr("data-year", data.year)
+                const thisEduData = eduData.find(edData => edData.fips === data.id);
+
+                tooltip.text(thisEduData.area_name + ", " + thisEduData.bachelorsOrHigher + "%")
+                .attr("data-education", thisEduData.bachelorsOrHigher)
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 20) + "px");
             }
             
             function hideTip() {
                 tooltip.style("display", "none");
-            }; */
+            }; 
             
             
+            //map description
+            map.append("desc")
+            .attr("id", "description")
+            .append("text")
+            .text("A choropleth map showing the various levels of educational attainment by county."
+            + "Color scale indicates percentage of residents who have a bachelors degree or higer.");
+              
             
-            
-            
-            
-            /* 
             //legend
-            const legend = graph.append("svg")
+            const legend = map.append("svg")
             .attr("height", 100)
             .attr("width", 300)
-            .attr("x", 120)
+            .attr("x", 475)
             .attr("y", 570)
             .attr("transform", "translate(" + padding + ", 500)")
             .attr("id", "legend"); 
             
-            //create array 0 to 1 by increments of .01
+            //create array for continuous legend
             const arr1 = [];
-            let x = -6.976;
+            let x = min;
             for(let i = 0; i < 100; i++){
                 arr1.push(x);
-                x = x + .122;
+                x = x + 1;
             }
             
             legend.selectAll("rect")
@@ -132,29 +119,24 @@
             .attr("y", 15)
             .attr("width", 3)
             .attr("height", 50)
-            .attr("fill", d => colorScale(d));
+            .attr("fill", d => color(d));
             
             legend.append("text")
             .attr("x", 5)
             .attr("y", 45)
             .attr("fill", "white")
-            .text(-6.976);
+            .text(min);
             
             legend.append("text")
             .attr("x", 260)
             .attr("y", 45)
-            .attr("fill", "white")
-            .text(5.228);
+            .attr("fill", "black")
+            .text(max);
             
             legend.append("text")
-            .text("Temp Variance (Celsius)")
-            .attr("x", 65)
-            .attr("y", 12); */
-            
-            
-            //test output
-            //console.log("Educational DATA: " + JSON.stringify(eduData));
-            
+            .text("% Education above Bachelors")
+            .attr("x", 40)
+            .attr("y", 12); 
         });
     </script>
     
