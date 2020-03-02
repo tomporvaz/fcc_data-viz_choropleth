@@ -22,3 +22,11 @@ body{
     border: 3px solid white ;
 }
 
+#githubbtn{
+    text-align: right;
+    padding: 3vh;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
